@@ -55,14 +55,97 @@
 grecaptcha.ready(function() {
     grecaptcha.execute('6Lcb7b8UAAAAAAGDH3wEgfnukyPfFhiLPaRlGB97', {action: 'homepage'}).then(function(token) {
        ...
+
+
+			 function createRecaptcha() {
+				grecaptcha.render("recaptcha", {
+					sitekey: "6Lcb7b8UAAAAAAGDH3wEgfnukyPfFhiLPaRlGB97",
+					theme: "light"
+				});
+			}
+			createRecaptcha();
+
+			window.showCaptcha = function() {
+				console.log('TEST');
+				document.getElementById("reveal-button").style.display = "none";
+				document.getElementById("captcha-wrapper").style.display = "block";
+			}
+
+			window.onCaptcha = function(response) {
+				return new Promise(function(resolve, reject) {
+
+					var response = grecaptcha.getResponse();
+					console.log(response);
+
+					if (!response) {
+						alert('Coud not get recaptcha response');
+						//return;
+						reject();
+					}
+
+					var email = "5c481f545c50585d71545c50585d1f525e5c";
+					var phone = "0106086969696969696969";
+
+				 console.log(window.myDecipher(email));
+
+					document.getElementById("email").innerHTML = window.myDecipher(email);
+					document.getElementById("phone-number").innerHTML = window.myDecipher(phone);
+					resolve();
+
+
+					grecaptcha.reset();
+
+				}); //end promise
+
+			}
+
+
+
+
+			window.cipher = salt => {
+				let textToChars = text => text.split('').map(c => c.charCodeAt(0))
+				let byteHex = n => ("0" + Number(n).toString(16)).substr(-2)
+				let applySaltToChar = code => textToChars(salt).reduce((a, b) => a ^ b, code)
+
+				return text => text.split('')
+					.map(textToChars)
+					.map(applySaltToChar)
+					.map(byteHex)
+					.join('')
+			}
+
+			window.decipher = salt => {
+				let textToChars = text => text.split('').map(c => c.charCodeAt(0))
+				let saltChars = textToChars(salt)
+				let applySaltToChar = code => textToChars(salt).reduce((a, b) => a ^ b, code)
+				return encoded => encoded.match(/.{1,2}/g)
+					.map(hex => parseInt(hex, 16))
+					.map(applySaltToChar)
+					.map(charCode => String.fromCharCode(charCode))
+					.join('')
+			}
+
+
+			window.myDecipher = window.decipher('12345');
+
+
+			/*
+			window.myCipher = window.cipher('12345');
+
+			var email_encrypted = myCipher("my.email@email.com");
+			var phone_encrypted = myCipher("079XXXXXXXX");
+
+			 console.log('EMAIL', email_encrypted);
+			 console.log('PHONE', phone_encrypted);  */
+
     });
 });
 </script>
-	
+
 
 	<script src="https://www.google.com/recaptcha/api.js?render=6Lcb7b8UAAAAAAGDH3wEgfnukyPfFhiLPaRlGB97"></script>
 	<style>
-	
+
 
 	.rc-anchor-pt {
 	  display: none;
@@ -112,89 +195,7 @@ grecaptcha.ready(function() {
 
 	</style>
 
-	<script>
-	function createRecaptcha() {
-  grecaptcha.render("recaptcha", {
-    sitekey: "6Lcb7b8UAAAAAAGDH3wEgfnukyPfFhiLPaRlGB97",
-    theme: "light"
-  });
-}
-createRecaptcha();
 
-window.showCaptcha = function() {
-  console.log('TEST');
-  document.getElementById("reveal-button").style.display = "none";
-  document.getElementById("captcha-wrapper").style.display = "block";
-}
-
-window.onCaptcha = function(response) {
-  return new Promise(function(resolve, reject) {
-
-    var response = grecaptcha.getResponse();
-    console.log(response);
-
-    if (!response) {
-      alert('Coud not get recaptcha response');
-      //return;
-      reject();
-    }
-
-    var email = "5c481f545c50585d71545c50585d1f525e5c";
-    var phone = "0106086969696969696969";
-
-		console.log(window.myDecipher(email));
-
-    document.getElementById("email").innerHTML = window.myDecipher(email);
-    document.getElementById("phone-number").innerHTML = window.myDecipher(phone);
-    resolve();
-
-
-    grecaptcha.reset();
-
-  }); //end promise
-
-}
-
-
-
-
-window.cipher = salt => {
-  let textToChars = text => text.split('').map(c => c.charCodeAt(0))
-  let byteHex = n => ("0" + Number(n).toString(16)).substr(-2)
-  let applySaltToChar = code => textToChars(salt).reduce((a, b) => a ^ b, code)
-
-  return text => text.split('')
-    .map(textToChars)
-    .map(applySaltToChar)
-    .map(byteHex)
-    .join('')
-}
-
-window.decipher = salt => {
-  let textToChars = text => text.split('').map(c => c.charCodeAt(0))
-  let saltChars = textToChars(salt)
-  let applySaltToChar = code => textToChars(salt).reduce((a, b) => a ^ b, code)
-  return encoded => encoded.match(/.{1,2}/g)
-    .map(hex => parseInt(hex, 16))
-    .map(applySaltToChar)
-    .map(charCode => String.fromCharCode(charCode))
-    .join('')
-}
-
-
-window.myDecipher = window.decipher('12345');
-
-
-/*
-window.myCipher = window.cipher('12345');
-
-var email_encrypted = myCipher("my.email@email.com");
-var phone_encrypted = myCipher("079XXXXXXXX");
-
- console.log('EMAIL', email_encrypted);
- console.log('PHONE', phone_encrypted);  */
-
-	</script>
 </head>
 
 <body>
